@@ -3,19 +3,64 @@ import { TextField, Fade } from "@mui/material"
 import { useState } from "react"
 
 export default function Sign(){
-		const [idValue,setIdValue] = useState("");
-		const [showPwField,setShowPwField] = useState(false);
-		const handleIdChange = (event) => {
-			const value = event.target.value;
-			setIdValue(value);
+	const [idValue,setIdValue] = useState("");
+	const [pwValue,setPwValue] = useState("");
+	const [pwCheckValue,setPwCheckValue] = useState("");
+	const [showPwField,setShowPwField] = useState(false);
+	const [showPwCheckField,setShowPwCheckField] = useState(false);
 
-			if(value.length >= 6 && value.length < 16){
-				setShowPwField(true);
-			}
-			else{
-				setShowPwField(false);
-			}
+	const [helpIdText,setHelpIdText] = useState("6-12자 이내 영문, 숫자 사용가능");
+	const [helpPwText,setHelpPwText] = useState("8-16자 이내 영문, 숫자, 특수문자 사용가능");
+	const [pwCheckHelpText,setHelpPwCheckText] = useState("8-16자 이내 영문, 숫자, 특수문자 사용가능");
+
+	const [idError, setIdError] = useState(false);
+	const [pwError, setPwError] = useState(false);
+	const [pwCheckError,setPwCheckError] = useState(false);
+
+	const handleIdChange = (event) => {
+		const value = event.target.value;
+		setIdValue(value);
+		const regexId = /^[a-zA-Z0-9]{6,12}$/;
+		if(regexId.test(value)){
+			setShowPwField(true);
+			setIdError(false);
+			setHelpIdText("유효한 ID입니다");
 		}
+		else{
+			setShowPwField(false);
+			setIdError(true);
+			setHelpIdText("6-12자 이내 영문, 숫자 사용가능.");
+		}
+	};
+
+	const handlePwChange = (event) => {
+		const value = event.target.value;
+		setPwValue(value);
+		const regexPw = /^(?=.*[a-zA-z])(?=.*[0-9])(?=.*[$`~!@#^?&\\(\\)\-_=+]).{8,16}$/;
+		if(regexPw.test(value)){
+			setShowPwCheckField(true);
+			setPwError(false);
+			setHelpPwText("유효한 PassWord입니다.");
+		}
+		else{
+			setShowPwCheckField(false);
+			setPwError(true);
+			setHelpPwText("8-16자 이내 영문, 숫자, 특수문자 사용가능.");
+		}
+	};
+
+	const handlePwCheckChange = (event) => {
+		const value = event.target.value;
+		setPwCheckValue(value);
+		if(pwValue == value){
+			setPwCheckError(false);
+			setHelpPwCheckText("");
+		}
+		else{
+			setPwCheckError(true);
+			setHelpPwCheckText("PassWord가 일치하지 않습니다.");
+		}
+	}
 
     return(
       <>
@@ -23,10 +68,11 @@ export default function Sign(){
 					<h2 className={styles.head}>회원가입</h2>
 					<div className={styles.form}>
 						<TextField
+							error={idError}
 							id="id-required"
 							label="ID"
-							placeholder="ID 입력이 필요합니다"
-							helperText="6-12자 이내 영문, 숫자 사용가능"
+							placeholder="ID 입력"
+							helperText={helpIdText}
 							fullWidth
 							value={idValue}
 							onChange={handleIdChange}	
@@ -34,10 +80,29 @@ export default function Sign(){
 						{showPwField && (
 							<Fade in={showPwField} timeout={500}>
 								<TextField
+									error={pwError}
 									id="password-required"
 									label="Password"
-									placeholder="Password 입력이 필요합니다"
-									helperText="8-16자 이내 영문, 숫자, 특수문자 사용가능"
+									type="password"
+									placeholder="Password 입력"
+									helperText={helpPwText}
+									value={pwValue}
+									onChange={handlePwChange}
+									fullWidth
+								></TextField>
+							</Fade>
+						)}
+						{showPwCheckField && (
+							<Fade in={showPwCheckField} timeout={500}>
+								<TextField
+									error={pwCheckError}
+									id="password-required"
+									label="Password 재확인"
+									type="password"
+									placeholder="Password 다시 입력"
+									helperText={pwCheckHelpText}
+									value={pwCheckValue}
+									onChange={handlePwCheckChange}
 									fullWidth
 								></TextField>
 							</Fade>
